@@ -175,7 +175,7 @@ def report_slot():
 
 def serverchan_send(sendkey, title, desp):
     if not sendkey:
-        raise RuntimeError("缺少 SERVERCHAN_SENDKEY")
+        raise RuntimeError("缺少 Server酱 SendKey")
 
     if sendkey.startswith("sctp"):
         import re
@@ -200,7 +200,18 @@ def serverchan_send(sendkey, title, desp):
     if data.get("code") != 0:
         raise RuntimeError(f"Server酱返回失败，code={data.get('code')}")
 
-    print("Server酱推送成功")
+
+def send_to_all(sendkeys, title, desp):
+    failures = []
+    for index, sendkey in enumerate(sendkeys, start=1):
+        try:
+            serverchan_send(sendkey, title, desp)
+            print(f"Server酱账号 {index} 推送成功")
+        except Exception as exc:
+            failures.append(f"账号 {index}: {type(exc).__name__}: {exc}")
+
+    if failures:
+        raise RuntimeError("；".join(failures))
 
 
 def build_report():
@@ -249,8 +260,6 @@ def build_report():
 """
         return title, desp
 
-    # 中行卖出价包含银行价差；ECB 是市场参考价。
-    # 用当前中行/ECB比例把历史市场价折算到近似同一口径，仅比较近期高低。
     bank_factor = sell / latest_market
     adjusted_rows = [(date_text, rate * bank_factor) for date_text, rate in history]
     adjusted = [rate for _, rate in adjusted_rows]
@@ -310,23 +319,31 @@ def build_report():
 
 
 def main():
-    sendkey = os.environ.get("SERVERCHAN_SENDKEY", "").strip()
+    sendkeys = [
+        value
+        for value in (
+            os.environ.get("SERVERCHAN_SENDKEY", "").strip(),
+            os.environ.get("SERVERCHAN_SENDKEY_2", "").strip(),
+        )
+        if value
+    ]
+
+    if not sendkeys:
+        raise RuntimeError("没有配置任何 Server酱 SendKey")
 
     try:
         title, desp = build_report()
-        print(title)
-        serverchan_send(sendkey, title, desp)
     except Exception as exc:
-        if sendkey:
-            try:
-                serverchan_send(
-                    sendkey,
-                    f"英镑购汇｜{report_slot()}｜获取失败",
-                    f"本次自动汇率简报没有生成成功。\n\n原因：`{type(exc).__name__}: {exc}`",
-                )
-            except Exception:
-                pass
+        error_title = f"英镑购汇｜{report_slot()}｜获取失败"
+        error_desp = f"本次自动汇率简报没有生成成功。\n\n原因：`{type(exc).__name__}: {exc}`"
+        try:
+            send_to_all(sendkeys, error_title, error_desp)
+        except Exception:
+            pass
         raise
+
+    print(title)
+    send_to_all(sendkeys, title, desp)
 
 
 if __name__ == "__main__":
