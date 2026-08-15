@@ -1,0 +1,1 @@
+# gbp-rate-notify
