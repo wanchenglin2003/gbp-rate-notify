@@ -2,8 +2,11 @@ name: Daily GBP Rate Notify
 
 on:
   schedule:
-    # GitHub Actions cron 使用 UTC；02:40 UTC = 北京时间 10:40
+    # GitHub Actions cron 使用 UTC
+    # 02:40 UTC = 北京时间 10:40
     - cron: "40 2 * * *"
+    # 08:30 UTC = 北京时间 16:30
+    - cron: "30 8 * * *"
   workflow_dispatch:
 
 jobs:
