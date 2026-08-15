@@ -28,4 +28,5 @@ jobs:
       - name: Generate report and send ServerChan notification
         env:
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+          SERVERCHAN_SENDKEY_2: ${{ secrets.SERVERCHAN_SENDKEY_2 }}
         run: python gbp_report.py
