@@ -1,0 +1,28 @@
+name: Daily GBP Rate Notify
+
+on:
+  schedule:
+    # GitHub Actions cron 使用 UTC；02:40 UTC = 北京时间 10:40
+    - cron: "40 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate report and send ServerChan notification
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+        run: python gbp_report.py
