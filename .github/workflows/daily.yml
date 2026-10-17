@@ -1,8 +1,8 @@
-name: Daily GBP Rate Notify
+name: BD Stock Monitor
 
 on:
   schedule:
-    # GitHub Actions cron 使用 UTC
+    # GitHub Actions cron uses UTC
     # 02:40 UTC = 北京时间 10:40
     - cron: "40 2 * * *"
     # 08:30 UTC = 北京时间 16:30
@@ -25,8 +25,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Generate report and send ServerChan notification
+      - name: Check official store stock and send ServerChan notification
         env:
           SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
           SERVERCHAN_SENDKEY_2: ${{ secrets.SERVERCHAN_SENDKEY_2 }}
-        run: python gbp_report.py
+          DOUYIN_PRODUCT_URL: ${{ vars.DOUYIN_PRODUCT_URL }}
+          PINDUODUO_PRODUCT_URL: ${{ vars.PINDUODUO_PRODUCT_URL }}
+          DOUYIN_COOKIE: ${{ secrets.DOUYIN_COOKIE }}
+          PINDUODUO_COOKIE: ${{ secrets.PINDUODUO_COOKIE }}
+        run: python stock_monitor.py
