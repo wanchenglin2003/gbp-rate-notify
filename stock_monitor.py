@@ -306,15 +306,11 @@ def build_notification(results):
 
 def main():
     sendkeys = [
-        value
-        for value in (
-            os.environ.get("SERVERCHAN_SENDKEY", "").strip(),
-            os.environ.get("SERVERCHAN_SENDKEY_2", "").strip(),
-        )
-        if value
+        os.environ.get("SERVERCHAN_SENDKEY", "").strip(),
+        os.environ.get("SERVERCHAN_SENDKEY_2", "").strip(),
     ]
-    if not sendkeys:
-        raise RuntimeError("没有配置任何 Server酱 SendKey")
+    if not all(sendkeys):
+        raise RuntimeError("需要配置两个 Server酱 SendKey，才能通知两台设备")
 
     results = [inspect_platform(config) for config in PLATFORMS]
     if all(item["state"] == "out" for item in results):
