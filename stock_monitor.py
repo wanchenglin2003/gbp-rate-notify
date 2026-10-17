@@ -121,11 +121,15 @@ def _matching_offers(product):
 
 def extract_listing(html):
     soup = BeautifulSoup(html, "html.parser")
-    products = list(_walk_json(
-        json.loads(script.string or script.get_text())
-        for script in soup.find_all("script", attrs={"type": "application/ld+json"})
-        if (script.string or script.get_text()).strip()
-    ))
+    products = []
+    for script in soup.find_all("script", attrs={"type": "application/ld+json"}):
+        raw = (script.string or script.get_text()).strip()
+        if not raw:
+            continue
+        try:
+            products.extend(_walk_json(json.loads(raw)))
+        except json.JSONDecodeError:
+            continue
     target = [
         product
         for product in products
