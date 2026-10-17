@@ -1,12 +1,7 @@
 name: BD Stock Monitor
 
 on:
-  schedule:
-    # GitHub Actions cron uses UTC
-    # 02:40 UTC = 北京时间 10:40
-    - cron: "40 2 * * *"
-    # 08:30 UTC = 北京时间 16:30
-    - cron: "30 8 * * *"
+  # Scheduled notifications are paused; use workflow_dispatch for an on-demand run.
   workflow_dispatch:
 
 jobs:
