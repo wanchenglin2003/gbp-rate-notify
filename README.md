@@ -25,7 +25,7 @@
 - `DOUYIN_COOKIE`
 - `PINDUODUO_COOKIE`
 
-Cookie 是登录凭据，登录态过期后需要在 GitHub Secrets 中更新。工作流只把它用于访问对应平台，不会写入日志或通知。
+Cookie 是登录凭据，格式应为请求头中的 `name=value; name2=value2`。登录态过期后需要在 GitHub Secrets 中更新。工作流只把它用于访问对应平台，不会写入日志或通知。
 
 ## 当前自动核验范围
 
